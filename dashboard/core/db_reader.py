@@ -1,4 +1,5 @@
 import glob, os, sqlite3, time
+
 TOKEN_ACTIONS = ("api_request", "auxiliary_result")
 
 def _files(db_root):
@@ -65,25 +66,24 @@ def query_token_details(db_root, *, user=None, limit=1000):
              "cost": float(r["cost"] or 0.0)} for r in rows]
 
 def aggregate_trends(db_root, start_ts=None, end_ts=None):
+    # ★ 修复：把 action IN (...) 提到 WHERE，这样没有产生 Token 的事件根本不会查出来
     sql = """
         SELECT user,
-            COUNT(CASE WHEN action IN ('api_request','auxiliary_result') THEN 1 END) AS cnt,
-            COALESCE(SUM(CASE WHEN action IN ('api_request','auxiliary_result') THEN input_tokens ELSE 0 END), 0) AS in_tok,
-            COALESCE(SUM(CASE WHEN action IN ('api_request','auxiliary_result') THEN output_tokens ELSE 0 END), 0) AS out_tok,
-            COALESCE(SUM(CASE WHEN action IN ('api_request','auxiliary_result') THEN total_tokens ELSE 0 END), 0) AS tot_tok,
+            COUNT(*) AS cnt,
+            COALESCE(SUM(input_tokens), 0) AS in_tok,
+            COALESCE(SUM(output_tokens), 0) AS out_tok,
+            COALESCE(SUM(total_tokens), 0) AS tot_tok,
             COALESCE(SUM(cost), 0) AS cost
         FROM events
+        WHERE action IN ('api_request','auxiliary_result')
     """
-    conditions = []
     params = []
     if start_ts:
-        conditions.append("ts >= ?")
+        sql += " AND ts >= ?"
         params.append(start_ts)
     if end_ts:
-        conditions.append("ts <= ?")
+        sql += " AND ts <= ?"
         params.append(end_ts)
-    if conditions:
-        sql += " WHERE " + " AND ".join(conditions)
     sql += " GROUP BY user"
 
     agg = {}

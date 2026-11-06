@@ -16,7 +16,7 @@ export async function mountTokenModal() {
       const tokenLimit = ref(1000);
       const tokenUser = ref('');
 
-      // ★ 自定义日期相关
+      // ★ 自定义日期范围
       const isCustomRange = ref(false);
       const customStart = ref('');
       const customEnd = ref('');
@@ -32,7 +32,7 @@ export async function mountTokenModal() {
         }
         isCustomRange.value = true;
 
-        // 解析精确到秒的时间戳
+        // 强制按精确到秒的 UTC 时间计算
         const startTs = Math.floor(new Date(customStart.value).getTime() / 1000);
         const endTs = Math.floor(new Date(customEnd.value).getTime() / 1000);
 
@@ -51,7 +51,6 @@ export async function mountTokenModal() {
       return {
         store, tokenTab, trendPeriod, tokenSummary, tokenDetails,
         tokenLimit, tokenUser, loadTrends, fetchTokenDetails, formatAction,
-        // ★ 返回日期相关变量
         isCustomRange, customStart, customEnd, doCustomRange
       };
     }
