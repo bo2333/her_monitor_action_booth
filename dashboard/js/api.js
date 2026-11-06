@@ -43,7 +43,26 @@ export const api = {
     }
     return fetch(`${API}/stats/trends?${p.toString()}`).then(r => r.json());
   },
-  getTokenDetails: (user, limit) => fetch(API + `/token_details?user=${user}&limit=${limit}`).then(r => r.json()),
+  getTokenDetails: (user, limit, start = null, end = null) => {
+    const p = new URLSearchParams();
+    if (user) p.append('user', user);
+    p.append('limit', String(limit));
+    if (start != null) p.append('start', String(start));
+    if (end != null) p.append('end', String(end));
+    return fetch(`${API}/token_details?${p.toString()}`).then(r => r.json());
+  },
+
+  // 增加汇总导出 URL 拼接
+  getExportTrendsUrl: (period, start, end) => {
+    const p = new URLSearchParams();
+    if (start != null && end != null) {
+      p.append('start', String(start));
+      p.append('end', String(end));
+    } else {
+      p.append('period', period);
+    }
+    return `${API}/export/trends?${p.toString()}`;
+  },
   getHistory: (user, limit) => fetch(API + `/history?user=${user}&limit=${limit}`).then(r => r.json()),
 
   getHistoryFiltered: ({ user, start, end, limit = 2000 }) => {

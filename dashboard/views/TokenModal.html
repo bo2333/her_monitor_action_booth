@@ -28,6 +28,9 @@
             <input type="datetime-local" step="1" v-model="customEnd" style="width: 185px; background:var(--bg-base); color:var(--text-high); border:1px solid var(--border-strong); padding:6px 10px; border-radius:4px; outline:none;">
             <button class="btn btn-primary" :class="{active:isCustomRange}" @click="doCustomRange">查询</button>
           </div>
+          <!-- ★ 汇总导出 -->
+          <a class="btn-download" style="margin-left: 12px;"
+             :href="getExportTrendsUrl()" download>📥 导出 CSV</a>
         </div>
 
         <table>
@@ -65,13 +68,21 @@
             <option value="">全部</option>
             <option v-for="u in store.users" :value="u">{{ u }}</option>
           </select>
-          <label>条数:</label>
-          <input type="number" v-model="tokenLimit" style="width:100px">
+
+          <!-- ★ 时间段 -->
+          <label>时间段:</label>
+          <input type="datetime-local" step="1" v-model="detailStart" style="width: 185px; background:var(--bg-base); color:var(--text-high); border:1px solid var(--border-strong); padding:6px 10px; border-radius:4px; outline:none;">
+          <span style="color:var(--text-low);">-</span>
+          <input type="datetime-local" step="1" v-model="detailEnd" style="width: 185px; background:var(--bg-base); color:var(--text-high); border:1px solid var(--border-strong); padding:6px 10px; border-radius:4px; outline:none;">
+
+          <!-- ★ 条数放到后面，默认 0 -->
+          <label>条数 (0=全部):</label>
+          <input type="number" v-model="tokenLimit" style="width:100px" min="0">
+
           <button class="btn btn-primary" @click="fetchTokenDetails">查询</button>
           <div class="spacer"></div>
           <a class="btn-download"
-             :href="'/api/plugins/monitor_action_booth/export/tokens?user=' + tokenUser + '&limit=' + tokenLimit"
-             download>📥 导出 CSV</a>
+             :href="getExportDetailsUrl()" download>📥 导出 CSV</a>
         </div>
         <table v-if="tokenDetails.length > 0">
           <thead>
