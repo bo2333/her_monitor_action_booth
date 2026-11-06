@@ -27,13 +27,19 @@ export async function mountTokenModal() {
 
       const doCustomRange = async () => {
         if (!customStart.value || !customEnd.value) {
-          alert('请选择完整的开始和结束日期');
+          alert('请选择完整的开始和结束时间');
           return;
         }
         isCustomRange.value = true;
-        // 转换为秒级时间戳
+
+        // 解析精确到秒的时间戳
         const startTs = Math.floor(new Date(customStart.value).getTime() / 1000);
-        const endTs = Math.floor(new Date(customEnd.value).getTime() / 1000) + 86399; // 包含当天结束
+        const endTs = Math.floor(new Date(customEnd.value).getTime() / 1000);
+
+        if (startTs > endTs) {
+          alert('开始时间不能晚于结束时间');
+          return;
+        }
 
         tokenSummary.value = await api.getTrends({ start: startTs, end: endTs });
       };

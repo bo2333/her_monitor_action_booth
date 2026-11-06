@@ -21,12 +21,12 @@
 
           <div class="spacer"></div>
 
-          <!-- ★ 自定义日期范围 -->
+          <!-- ★ 自定义精确到秒的范围 -->
           <div style="display:flex; align-items:center; gap: 8px;">
-            <input type="date" v-model="customStart" style="background:var(--bg-base); color:var(--text-high); border:1px solid var(--border-strong); padding:6px 10px; border-radius:4px; outline:none;">
+            <input type="datetime-local" step="1" v-model="customStart" style="width: 185px; background:var(--bg-base); color:var(--text-high); border:1px solid var(--border-strong); padding:6px 10px; border-radius:4px; outline:none;">
             <span style="color:var(--text-low);">-</span>
-            <input type="date" v-model="customEnd" style="background:var(--bg-base); color:var(--text-high); border:1px solid var(--border-strong); padding:6px 10px; border-radius:4px; outline:none;">
-            <button class="btn" :class="{active:isCustomRange}" @click="doCustomRange">查询</button>
+            <input type="datetime-local" step="1" v-model="customEnd" style="width: 185px; background:var(--bg-base); color:var(--text-high); border:1px solid var(--border-strong); padding:6px 10px; border-radius:4px; outline:none;">
+            <button class="btn btn-primary" :class="{active:isCustomRange}" @click="doCustomRange">查询</button>
           </div>
         </div>
 
