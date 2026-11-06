@@ -1,0 +1,233 @@
+<div class="modal-mask" v-if="store.showSettings" @click.self="store.showSettings=false">
+  <div class="modal" style="max-width: 800px; height: 75vh;">
+    <div class="modal-header">
+      <span>⚙ 监控大厅设置</span>
+      <button class="close-btn" @click="store.showSettings=false">✕</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab" :class="{active:settingsTab==='booth'}" @click="settingsTab='booth'">大厅配置</div>
+      <div class="tab" :class="{active:settingsTab==='master'}" @click="settingsTab='master'">监察大师配置</div>
+      <div class="tab" :class="{active:settingsTab==='colors'}" @click="settingsTab='colors'">颜色外观</div>
+      <div class="tab" :class="{active:settingsTab==='update'}" @click="settingsTab='update'; loadUpdateStatus()">更新</div>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- 1. 大厅自身配置 -->
+      <div v-if="settingsTab==='booth'" style="padding-top: 10px;">
+        <div class="setting-grid">
+          <div class="setting-card">
+            <label>屏幕最大展示条数</label>
+            <input type="number" v-model="store.cfg.booth.max_screen_entries">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 监察大师配置 -->
+      <div v-if="settingsTab==='master'" style="padding-top: 10px;">
+
+        <!-- ★ 1. 安装插件 -->
+        <h3 style="font-size: 13px; margin: 0 0 16px; color: var(--text-high); text-transform: uppercase; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">安装插件</h3>
+        <div class="setting-grid" style="margin-bottom: 28px;">
+          <!-- 左卡片：安装状态 -->
+          <div class="setting-card" style="flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 12px;">
+            <label>安装监察大师插件</label>
+            <div v-if="store.cfg.master_exists" style="color: var(--success); font-weight: 600; font-size: 14px; padding: 8px 0;">
+              ✅ 已安装
+            </div>
+            <div v-else style="width: 100%;">
+              <div style="background:rgba(248,81,73,0.1); border:1px solid rgba(248,81,73,0.3); padding:10px; border-radius:6px; color:var(--danger); font-size:12px; line-height:1.6; margin-bottom: 12px;">
+                ⚠️ 未检测到监察大师插件。<br>请点击下方按钮安装。
+              </div>
+              <button class="btn" style="background:rgba(88,166,255,0.1); color:var(--primary); border-color:rgba(88,166,255,0.3); width: 100%; justify-content: center;" :disabled="installingMaster" @click="installMaster">
+                {{ installingMaster ? '⏳ 安装中...' : '📦 安装 Master' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 右卡片：集群维护 -->
+          <div class="setting-card" style="flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 12px;">
+            <label>集群维护</label>
+            <div style="width: 100%;">
+              <div style="color: var(--text-low); font-size: 12px; margin-bottom: 12px; line-height: 1.6;">
+                自动为 profiles 目录下未链接/链接错误的 Agent 创建软链接。
+              </div>
+              <button class="btn" style="background:rgba(88,166,255,0.1); color:var(--primary); border-color:rgba(88,166,255,0.3); width: 100%; justify-content: center;" @click="openInstall">
+                📦 部署到各 Agent
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ★ 2. 目录相关 -->
+        <h3 style="font-size: 13px; margin: 0 0 16px; color: var(--text-high); text-transform: uppercase; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">目录相关</h3>
+        <div class="setting-grid" style="margin-bottom: 28px;">
+          <!-- 配置目录 -->
+          <div class="setting-card" style="grid-column: 1 / -1;">
+            <label>配置目录</label>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end;">
+              <code class="path-code" :title="store.cfg.master_config_path">
+                {{ store.cfg.master_config_path || '-' }}
+              </code>
+            </div>
+          </div>
+
+          <!-- 数据库根目录 -->
+          <div class="setting-card" style="grid-column: 1 / -1; align-items: center;">
+            <label>数据库根目录</label>
+            <div class="db-root-row">
+              <input type="text" v-model="store.cfg.master.db_root"
+                     style="width: 320px; background:var(--bg-base); border:1px solid var(--border-strong);
+                            color:var(--text-high); padding:6px; border-radius:4px;"
+                     @blur="checkDbRoot" @change="checkDbRoot"
+                     placeholder="留空使用默认：monitor_action_master/data">
+              <span :class="dbStatusClass()" :title="dbStatus && dbStatus.path ? dbStatus.path : ''">
+                {{ dbStatusText() }}
+              </span>
+              <button v-if="dbStatus && !dbStatus.exists && dbStatus.message === '目录不存在'"
+                      class="btn" style="background:rgba(88,166,255,0.1); color:var(--primary); border-color:rgba(88,166,255,0.3);"
+                      :disabled="creating" @click="createDbRoot">
+                {{ creating ? '⏳ 创建中...' : '创建目录' }}
+              </button>
+              <button v-if="dbStatus && dbStatus.exists && !dbStatus.ok" class="btn"
+                      style="background:rgba(248,81,73,0.1); color:var(--danger); border-color:rgba(248,81,73,0.3);"
+                      :disabled="fixing" @click="fixPerm">
+                {{ fixing ? '⏳ 设置中...' : '设置权限' }}
+              </button>
+              <button class="btn" :disabled="dbChecking" @click="checkDbRoot" title="重新检测目录状态">🔄</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ★ 3. 日志开关 -->
+        <h3 style="font-size: 13px; margin: 0 0 16px; color: var(--text-high); text-transform: uppercase; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">日志开关</h3>
+        <div class="setting-grid" style="margin-bottom: 28px;">
+          <div class="setting-card">
+            <label>启用事件写入</label>
+            <input type="checkbox" v-model="store.cfg.master.enabled" style="width:20px;height:20px;">
+          </div>
+          <div class="setting-card">
+            <label>输出运行日志</label>
+            <input type="checkbox" v-model="store.cfg.master.logging" style="width:20px;height:20px;">
+          </div>
+        </div>
+
+        <!-- ★ 4. TCP 远程推送 -->
+        <h3 style="font-size: 13px; margin: 0 0 16px; color: var(--text-high); text-transform: uppercase; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">TCP 远程推送 （配套windows软件：monitor-server-tcp）</h3>
+
+        <div style="display: flex; gap: 20px; align-items: stretch;">
+          <!-- 左卡片 -->
+          <div class="setting-card" style="flex: 1; justify-content: flex-start; gap: 32px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; white-space: nowrap;">
+              <input type="checkbox" v-model="store.cfg.master.remote.enabled" style="width:20px; height:20px; margin:0;">
+              启用推送
+            </label>
+
+            <div style="display:flex; align-items:center; gap:8px; white-space: nowrap;">
+              <label style="margin: 0;">地址</label>
+              <input type="text" v-model="store.cfg.master.remote.host"
+                     style="width:160px; background:var(--bg-base); border:1px solid var(--border-strong);
+                            color:var(--text-high); padding:6px; border-radius:4px;">
+              <span style="color:var(--text-low); font-weight:bold;">:</span>
+              <input type="number" v-model="store.cfg.master.remote.port"
+                     style="width:90px; background:var(--bg-base); border:1px solid var(--border-strong);
+                            color:var(--text-high); padding:6px; border-radius:4px;">
+            </div>
+          </div>
+
+          <!-- 右卡片 -->
+          <div class="setting-card" style="width: 240px;">
+            <label>心跳间隔 (秒)</label>
+            <input type="number" v-model="store.cfg.master.remote.check_interval"
+                   style="width:80px; background:var(--bg-base); border:1px solid var(--border-strong);
+                          color:var(--text-high); padding:6px; border-radius:4px;">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. 颜色外观 -->
+      <div v-if="settingsTab==='colors'">
+        <h3 style="font-size: 13px; margin-bottom: 20px; color: var(--text-high); text-transform: uppercase;">
+          字段前景色
+        </h3>
+        <div class="setting-grid">
+          <div class="setting-card" v-for="(v,k) in store.cfg.booth.colors" :key="k" v-show="k!=='level_bg'">
+            <span>{{ getColorLabel(k) }}</span>
+            <input type="color" class="color-input" v-model="store.cfg.booth.colors[k]">
+          </div>
+        </div>
+        <h3 style="font-size: 13px; margin: 32px 0 20px; color: var(--text-high); text-transform: uppercase;">
+          Level 竖线色 (支持透明度)
+        </h3>
+        <div class="slider-row" v-for="(lv,k) in store.cfg.booth.colors.level_bg" :key="k">
+          <span style="width: 70px; font-weight: bold; color: var(--text-high);">Level {{ k }}</span>
+          <input type="color" class="color-input" v-model="lv.color">
+          <span style="font-size: 12px; color:var(--text-low); margin-left: 12px;">透明度</span>
+          <input type="range" v-model="lv.alpha" min="0" max="100">
+          <span style="width: 50px; text-align:right; color:var(--primary); font-weight: bold;">
+            {{ lv.alpha }}%
+          </span>
+        </div>
+      </div>
+
+      <!-- 4. 更新 -->
+      <div v-if="settingsTab==='update'" style="padding-top: 10px;">
+        <div class="setting-grid">
+          <!-- Booth -->
+          <div class="setting-card" style="grid-column: 1 / -1;">
+            <div>
+              <label>监控大厅 (booth)</label>
+              <div style="color: var(--text-low); font-size: 12px; margin-top: 4px;">
+                {{ updateStatus && updateStatus.booth ? updateStatus.booth.path : '' }}
+              </div>
+            </div>
+            <button class="btn btn-primary" :disabled="updateBoothRunning" @click="runUpdateBooth">
+              {{ updateBoothRunning ? '⏳ 更新中...' : '⬆️ 更新 Booth' }}
+            </button>
+          </div>
+
+          <!-- Master -->
+          <div v-if="updateStatus && updateStatus.master && updateStatus.master.installed"
+               class="setting-card" style="grid-column: 1 / -1;">
+            <div>
+              <label>监察大师 (master)</label>
+              <div style="color: var(--text-low); font-size: 12px; margin-top: 4px;">
+                {{ updateStatus.master.path }}
+              </div>
+            </div>
+            <template v-if="updateStatus.master.git">
+              <button class="btn btn-primary" :disabled="updateMasterRunning" @click="runUpdateMaster">
+                {{ updateMasterRunning ? '⏳ 更新中...' : '⬆️ 更新 Master' }}
+              </button>
+            </template>
+            <span v-else style="color: var(--text-low); font-size: 13px; font-weight: 600;">
+              非 github 安装（无法通过此处更新）
+            </span>
+          </div>
+          <div v-else class="setting-card" style="grid-column: 1 / -1;">
+            <label>监察大师 (master)</label>
+            <span style="color: var(--text-low); font-size: 13px;">未安装</span>
+          </div>
+        </div>
+
+        <!-- 日志框 -->
+        <div v-show="updateLog.length > 0 || updateBoothRunning || updateMasterRunning"
+             ref="updateLogBox" class="update-log-box">
+          <div v-for="(l, i) in updateLog" :key="i" class="update-log-line">{{ l }}</div>
+          <div v-if="updateBoothRunning || updateMasterRunning"
+               class="update-log-line" style="color: var(--primary);">执行中...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div style="padding: 16px 24px; background: var(--bg-elevated);
+                display: flex; justify-content: flex-end; gap: 12px;
+                border-top: 1px solid var(--border-subtle);">
+      <button class="btn" @click="store.showSettings=false">取消</button>
+      <button class="btn btn-primary" @click="saveConfig">保存并应用</button>
+    </div>
+  </div>
+</div>

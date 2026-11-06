@@ -1,0 +1,59 @@
+<div class="modal-mask" v-if="store.showInstall" @click.self="store.showInstall=false">
+  <div class="modal" style="max-width: 750px; height: 72vh;">
+    <div class="modal-header">
+      <span>📦 部署监察大师到各 Agent</span>
+      <button class="close-btn" @click="store.showInstall=false">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column;">
+      <transition name="fade">
+        <div v-if="statusMessage" :style="{ padding: '10px 16px', marginBottom: '16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', background: statusMessage.type === 'success' ? 'rgba(63,185,80,0.1)' : 'rgba(248,81,73,0.1)', border: '1px solid ' + (statusMessage.type === 'success' ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)'), color: statusMessage.type === 'success' ? 'var(--success)' : 'var(--danger)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }">
+          <span>{{ statusMessage.text }}</span>
+          <button style="background:none;border:none;color:inherit;cursor:pointer;font-size:16px;opacity:0.7;" @click="statusMessage = null">✕</button>
+        </div>
+      </transition>
+      <div v-if="!result.master_exists" class="warn-box">
+        ⚠️ 未找到主插件目录：<br><code>{{ result.master_plugin_dir }}</code><br>请先将 <code>monitor_action_master</code> 安装到该目录，然后重新打开本弹窗。
+      </div>
+      <template v-else>
+        <div class="info-box">
+          将遍历 <code>{{ result.profiles_dir }}</code> 下所有 Agent 的 <code>plugins/monitor_action_master</code>，检查软链接状态。<br>
+          缺失或错误会自动修复；已正确链接的节点点击修复也会重新激活。<br>
+          <b>注意：</b>激活前会先检查 Profile 是否真实存在，残留目录将被跳过。
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-primary" @click="doInstall" :disabled="loading">{{ loading ? '⏳ 处理中(执行激活和重启)...' : '🔧 自动安装 / 修复 / 激活' }}</button>
+          <button class="btn" @click="loadStatus" :disabled="loading">🔄 重新检查</button>
+          <div class="spacer"></div>
+          <span class="stat-text">已链接 <b style="color:var(--success);">{{ countBy('linked') }}</b> / 未激活 <b style="color:#d29922;">{{ countBy('linked_inactive') }}</b> / 残留 <b style="color:var(--text-low);">{{ countBy('skipped') }}</b> / 错误 <b style="color:#d29922;">{{ countBy('broken') }}</b> / 独立 <b style="color:var(--text-low);">{{ countBy('conflict') }}</b></span>
+        </div>
+        <div v-if="result.reload" class="info-box" style="margin-top: 0; margin-bottom: 16px;" :style="result.reload.ok ? 'background:rgba(63,185,80,0.08); border-color:rgba(63,185,80,0.25);' : 'background:rgba(248,81,73,0.08); border-color:rgba(248,81,73,0.3);'">
+          {{ result.reload.ok ? '✅ 重启网关成功' : '❌ 重启网关失败' }}：<code style="white-space: pre-wrap; word-break: break-all; font-size: 11px;">{{ result.reload.message || '无输出' }}</code>
+        </div>
+        <div v-if="result.activation && result.activation.some(a => !a.ok && !a.skipped)" class="warn-box" style="margin-top: 0; margin-bottom: 16px;">
+          <div style="font-weight:bold; margin-bottom:6px;">以下 Agent 激活失败：</div>
+          <div v-for="a in result.activation.filter(a => !a.ok && !a.skipped)" :key="a.profile" style="margin-bottom:4px;"><b>{{ a.profile }}</b>: <code style="font-size:11px;">{{ a.message }}</code></div>
+        </div>
+        <div class="result-table">
+          <table>
+            <thead>
+              <tr><th style="width:220px;">Agent / Profile</th><th style="width:120px;">状态</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="p in result.profiles" :key="p.name">
+                <td style="font-weight:600; color:var(--text-high);">{{ p.name }}</td>
+                <td><span :class="'status-' + p.status">{{ statusText(p.status) }}</span></td>
+                <td style="font-size:12px; color:var(--text-low); word-break:break-all;">{{ p.message }}<div v-if="p.target" style="margin-top:2px; font-family:monospace; font-size:11px;">→ {{ p.target }}</div></td>
+              </tr>
+              <tr v-if="result.profiles.length === 0">
+                <td colspan="3" style="text-align:center; padding:40px; color:var(--text-low);">未发现任何 Agent Profile（profiles 目录下无子目录）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+    </div>
+    <div style="padding: 16px 24px; background: var(--bg-elevated); text-align: right; border-top: 1px solid var(--border-subtle);">
+      <button class="btn" @click="store.showInstall=false">关闭</button>
+    </div>
+  </div>
+</div>

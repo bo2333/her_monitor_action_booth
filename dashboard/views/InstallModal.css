@@ -1,0 +1,17 @@
+.warn-box { background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3); padding: 14px; border-radius: 6px; color: var(--danger); font-size: 13px; line-height: 1.8; margin-bottom: 16px; }
+.warn-box code, .info-box code { background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-family: ui-monospace, monospace; font-size: 12px; }
+.info-box { background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.25); padding: 12px 14px; border-radius: 6px; color: var(--text-high); font-size: 13px; line-height: 1.7; margin-bottom: 16px; }
+.action-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-text { font-size: 12px; color: var(--text-low); white-space: nowrap; }
+.stat-text b { font-weight: 700; }
+.result-table { flex: 1; min-height: 0; overflow: auto; border: 1px solid var(--border-subtle); border-radius: 8px; }
+.status-linked { color: var(--success); font-weight: 600; }
+.status-missing { color: var(--danger); font-weight: 600; }
+.status-broken { color: #d29922; font-weight: 600; }
+.status-conflict { color: var(--text-low); font-weight: 600; }
+.status-error { color: var(--danger); font-weight: 600; }
+.status-unknown { color: var(--text-low); }
+.status-linked-inactive { color: #d29922; font-weight: 600; }
+.status-skipped { color: var(--text-low); font-weight: 600; font-style: italic; }
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }

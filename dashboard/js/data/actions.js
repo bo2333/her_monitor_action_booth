@@ -1,0 +1,47 @@
+export const ACTION_MAP = {
+  'LLM请求': '🧠 请求模型 (LLM Request)',
+  'LLM返回': '💬 模型返回 (LLM Response)',
+  'api_request_start': '📡 API 请求发出 (API Start)',
+  'api_request': '🌐 API 请求成功 (API Request)',
+  'api_error': '⚠️ API 请求异常 (API Error)',
+  'subagent_start': '🤖 子代理启动 (Subagent Start)',
+  'subagent_stop': '🏁 子代理结束 (Subagent Stop)',
+  'approval_request': '🛡️ 审批请求 (Approval Request)',
+  'approval_response': '🔏 审批结果 (Approval Response)',
+  'auxiliary_call': '✨ 辅助调用 (Auxiliary Call)',
+  'auxiliary_result': '🎯 辅助返回 (Auxiliary Result)',
+  'session_start': '🚀 会话开始 (Session Start)',
+  'session_end': '🛑 会话结束 (Session End)',
+  'session_finalize': '🗑️ 会话销毁 (Session Finalize)',
+  'context_compression': '🗜️ 上下文压缩 (Context Compression)',
+  'memory_update': '💾 记忆更新 (Memory Update)',
+  'task_plan': '📋 任务规划 (Task Plan)',
+  'transform_llm_output': '🔄 模型输出转换 (Transform LLM)',
+  'session_reset': '🔄 会话重置 (Session Reset)',
+  'session_delete': '❌ 会话删除 (Session Delete)',
+  'human_input_request': '⏸️ 等待人工输入 (Human Input Request)',
+  'human_input_resolved': '▶️ 人工输入结束 (Human Input Resolved)',
+  'transform_terminal_output': '💻 终端输出 (Terminal Output)',
+  'pre_transcription': '🎙️ 语音转录 (Transcription)',
+  'pre_verify': '🔍 代码验证 (Verify)',
+  'skill_lifecycle': '🎯 技能状态 (Skill Lifecycle)',
+  'kanban_task_completed': '✅ 看板完成 (Kanban Completed)',
+  'kanban_task_blocked': '🚫 看板阻塞 (Kanban Blocked)',
+};
+
+export const ACTION_CATEGORIES = {
+  api: ['LLM请求', 'LLM返回', 'api_request_start', 'api_request', 'api_error', 'transform_llm_output'],
+  lifecycle: ['session_start', 'session_end', 'session_finalize', 'context_compression', 'memory_update', 'task_plan'],
+  subagent: ['subagent_start', 'subagent_stop', 'approval_request', 'approval_response', 'auxiliary_call', 'auxiliary_result'],
+  human: ['human_input_request', 'human_input_resolved'],
+  terminal: ['transform_terminal_output'],
+  verify: ['pre_verify'],
+  skill: ['skill_lifecycle'],
+  kanban: ['kanban_task_completed', 'kanban_task_blocked'],
+};
+
+export const PRESET_ACTIONS = [
+  ...ACTION_CATEGORIES.api, ...ACTION_CATEGORIES.lifecycle, ...ACTION_CATEGORIES.subagent,
+  ...ACTION_CATEGORIES.human, ...ACTION_CATEGORIES.terminal, ...ACTION_CATEGORIES.verify,
+  ...ACTION_CATEGORIES.skill, ...ACTION_CATEGORIES.kanban,
+];

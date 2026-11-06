@@ -1,0 +1,19 @@
+{
+  "max_screen_entries": 2000,
+  "colors": {
+    "ts": "#8b949e",
+    "ip": "#d2a8ff",
+    "user": "#7ee787",
+    "flow_send": "#ffa657",
+    "flow_recv": "#79c0ff",
+    "action": "#ff7b72",
+    "level_bg": {
+      "0": { "color": "#8b949e", "alpha": 30 },
+      "1": { "color": "#58a6ff", "alpha": 30 },
+      "2": { "color": "#3fb950", "alpha": 30 },
+      "3": { "color": "#d29922", "alpha": 40 },
+      "4": { "color": "#f85149", "alpha": 40 },
+      "5": { "color": "#ff7b72", "alpha": 50 }
+    }
+  }
+}

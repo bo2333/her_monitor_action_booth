@@ -1,0 +1,12 @@
+{
+  "name": "monitor_action_booth",
+  "label": "监控大厅",
+  "icon": "Activity",
+  "version": "1.2.0",
+  "tab": {
+    "path": "/monitor-booth",
+    "position": "after:skills"
+  },
+  "entry": "dist/index.js",
+  "api": "plugin_api.py"
+}

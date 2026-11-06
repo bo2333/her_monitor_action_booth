@@ -1,0 +1,105 @@
+<div class="top-bar">
+  <div class="filter-group">
+    <!-- 用户 -->
+    <div class="input-wrapper">
+      <span>👤 用户</span>
+      <select v-model="store.filterUser">
+        <option value="">全部用户</option>
+        <option v-for="u in store.users" :value="u">{{ u }}</option>
+      </select>
+    </div>
+
+    <!-- 动作/方向 -->
+    <div class="input-wrapper action-dropdown">
+      <span>🎯 动作 / 方向</span>
+      <div class="dropdown-trigger" @click.stop="toggleActionDropdown">
+        {{ actionTriggerText }}
+      </div>
+      <div class="dropdown-panel" v-show="actionDropdownOpen" @click.stop>
+        <div class="dropdown-item" @click="selectNone">
+          <span :class="{'selected': store.filterAction.mode === 'none'}">暂无</span>
+        </div>
+        <div class="dropdown-item" @click="selectAll">
+          <span :class="{'selected': store.filterAction.mode === 'all' && store.filterAction.checked === null}">全部</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div v-for="group in actionGroups" :key="group.label">
+          <div class="dropdown-category">{{ group.label }}</div>
+          <div v-for="opt in group.options" :key="opt.value" class="dropdown-item">
+            <input type="checkbox"
+                   :checked="isActionChecked(opt.value)"
+                   :disabled="opt.disabled"
+                   @change="toggleAction(opt.value)">
+            <label :style="opt.disabled ? 'color:#8b949e;font-style:italic;' : ''">{{ opt.label }}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 开始时间 -->
+    <div class="input-wrapper time-wrapper">
+      <span>📅 开始</span>
+      <input type="datetime-local" v-model="store.queryStart">
+    </div>
+
+    <!-- 结束时间 -->
+    <div class="input-wrapper time-wrapper">
+      <span>📅 结束</span>
+      <input type="datetime-local" v-model="store.queryEnd">
+    </div>
+
+    <!-- 查询 & 清空 -->
+    <button class="btn btn-primary" @click="doQuery" :disabled="loading">
+      {{ loading ? '⏳ 查询中...' : '🔍 查询' }}
+    </button>
+    <button class="btn" @click="clearLogs">🗑 清空</button>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="right-group">
+    <button class="btn" @click="store.showToken = true">🪙 Token 明细</button>
+    <button class="btn" @click="store.showSettings = true">⚙ 设置</button>
+
+    <!-- ★ 运行状态按钮与下拉面板 -->
+    <div class="status-container">
+      <div class="status-btn" :class="isAllHealthy ? 'status-ok' : 'status-error'" @click.stop="toggleStatusPopover">
+        <span class="status-dot"></span>
+        {{ isAllHealthy ? '运行正常' : '运行异常' }}
+      </div>
+
+      <div class="status-panel" v-show="showStatusPopover" @click.stop>
+        <div class="status-panel-header">
+          <span>Agent 运行状态</span>
+          <button class="close-btn" style="font-size:14px;padding:0 4px;" @click="showStatusPopover=false">✕</button>
+        </div>
+        <div class="status-panel-body">
+          <table>
+            <thead>
+              <tr><th>Agent</th><th>角色</th><th>PID</th><th>状态</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="st in runtimeStatus" :key="st._file">
+                <td style="font-weight:bold; color:#7ee787;">{{ st.agent }}</td>
+                <td>{{ st.role }}</td>
+                <td style="color:var(--text-low);">{{ st.pid }}</td>
+                <td>
+                  <span v-if="hasDepsError(st)" style="color:var(--danger); font-weight:bold;">异常</span>
+                  <span v-else style="color:var(--success); font-weight:bold;">正常</span>
+                </td>
+              </tr>
+              <tr v-if="runtimeStatus.length === 0">
+                <td colspan="4" style="text-align:center; color:var(--text-low); padding:20px;">暂无运行中的 Agent</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="status-panel-footer">
+          <button class="btn" style="padding: 4px 10px; font-size:12px;" @click="loadStatus" :disabled="loadingStatus">
+            {{ loadingStatus ? '刷新中...' : '🔄 刷新' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
