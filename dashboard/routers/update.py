@@ -40,6 +40,6 @@ def update_booth():
 
 @router.post("/update_master")
 def update_master():
-    if not os.path.isdir(MASTER_DIR): raise HTTPException(400, "monitor_action_master 未安装")
-    if not _has_git(MASTER_DIR): raise HTTPException(400, "monitor_action_master 不是 git 仓库，无法更新")
+    if not os.path.isdir(MASTER_DIR): raise HTTPException(400, "her_monitor_action_master 未安装")
+    if not _has_git(MASTER_DIR): raise HTTPException(400, "her_monitor_action_master 不是 git 仓库，无法更新")
     return _stream_git_pull(MASTER_DIR)

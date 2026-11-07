@@ -1,4 +1,4 @@
-"""monitor_action_booth Dashboard 后端入口：仅聚合 router。"""
+"""her_monitor_action_booth Dashboard 后端入口：仅聚合 router。"""
 import os
 import sys
 

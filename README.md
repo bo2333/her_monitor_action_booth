@@ -1,43 +1,43 @@
-monitor_action_booth/
-©À©¤©¤ plugin.yaml
-©À©¤©¤ booth_config.json
-©¸©¤©¤ dashboard/
-    ©À©¤©¤ manifest.json
-    ©À©¤©¤ index.html
-    ©À©¤©¤ plugin_api.py
-    ©À©¤©¤ dist/
-    ©¦   ©¸©¤©¤ index.js
-    ©À©¤©¤ core/
-    ©¦   ©À©¤©¤ __init__.py
-    ©¦   ©À©¤©¤ paths.py
-    ©¦   ©À©¤©¤ utils.py
-    ©¦   ©À©¤©¤ master_config.py
-    ©¦   ©¸©¤©¤ db_reader.py
-    ©À©¤©¤ routers/
-    ©¦   ©À©¤©¤ __init__.py
-    ©¦   ©À©¤©¤ config.py
-    ©¦   ©À©¤©¤ meta.py
-    ©¦   ©À©¤©¤ history.py
-    ©¦   ©À©¤©¤ token.py
-    ©¦   ©À©¤©¤ stats.py
-    ©¦   ©À©¤©¤ install.py
-    ©¦   ©¸©¤©¤ update.py
-    ©À©¤©¤ css/
-    ©¦   ©À©¤©¤ base.css
-    ©¦   ©¸©¤©¤ view-base.css
-    ©À©¤©¤ js/
-    ©¦   ©À©¤©¤ app.js
-    ©¦   ©À©¤©¤ store.js
-    ©¦   ©À©¤©¤ api.js
-    ©¦   ©À©¤©¤ utils.js
-    ©¦   ©À©¤©¤ parsers.js
-    ©¦   ©¸©¤©¤ data/
-    ©¦       ©À©¤©¤ actions.js
-    ©¦       ©¸©¤©¤ colors.js
-    ©¸©¤©¤ views/
-        ©À©¤©¤ TopBar.html, TopBar.js, TopBar.css
-        ©À©¤©¤ LogsView.html, LogsView.js, LogsView.css
-        ©À©¤©¤ TokenModal.html, TokenModal.js, TokenModal.css
-        ©À©¤©¤ SettingsModal.html, SettingsModal.js, SettingsModal.css
-        ©¸©¤©¤ InstallModal.html, InstallModal.js, InstallModal.css
-        (É¾³ý HistoryModal.*)
+her_monitor_action_booth/
+â”œâ”€â”€ plugin.yaml
+â”œâ”€â”€ booth_config.json
+â””â”€â”€ dashboard/
+    â”œâ”€â”€ manifest.json
+    â”œâ”€â”€ index.html
+    â”œâ”€â”€ plugin_api.py
+    â”œâ”€â”€ dist/
+    â”‚   â””â”€â”€ index.js
+    â”œâ”€â”€ core/
+    â”‚   â”œâ”€â”€ __init__.py
+    â”‚   â”œâ”€â”€ paths.py
+    â”‚   â”œâ”€â”€ utils.py
+    â”‚   â”œâ”€â”€ master_config.py
+    â”‚   â””â”€â”€ db_reader.py
+    â”œâ”€â”€ routers/
+    â”‚   â”œâ”€â”€ __init__.py
+    â”‚   â”œâ”€â”€ config.py
+    â”‚   â”œâ”€â”€ meta.py
+    â”‚   â”œâ”€â”€ history.py
+    â”‚   â”œâ”€â”€ token.py
+    â”‚   â”œâ”€â”€ stats.py
+    â”‚   â”œâ”€â”€ install.py
+    â”‚   â””â”€â”€ update.py
+    â”œâ”€â”€ css/
+    â”‚   â”œâ”€â”€ base.css
+    â”‚   â””â”€â”€ view-base.css
+    â”œâ”€â”€ js/
+    â”‚   â”œâ”€â”€ app.js
+    â”‚   â”œâ”€â”€ store.js
+    â”‚   â”œâ”€â”€ api.js
+    â”‚   â”œâ”€â”€ utils.js
+    â”‚   â”œâ”€â”€ parsers.js
+    â”‚   â””â”€â”€ data/
+    â”‚       â”œâ”€â”€ actions.js
+    â”‚       â””â”€â”€ colors.js
+    â””â”€â”€ views/
+        â”œâ”€â”€ TopBar.html, TopBar.js, TopBar.css
+        â”œâ”€â”€ LogsView.html, LogsView.js, LogsView.css
+        â”œâ”€â”€ TokenModal.html, TokenModal.js, TokenModal.css
+        â”œâ”€â”€ SettingsModal.html, SettingsModal.js, SettingsModal.css
+        â””â”€â”€ InstallModal.html, InstallModal.js, InstallModal.css
+        (åˆ é™¤ HistoryModal.*)

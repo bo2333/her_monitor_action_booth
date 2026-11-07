@@ -7,15 +7,15 @@ BOOTH_DIR = os.path.dirname(_DASHBOARD_DIR)
 BOOTH_CONFIG = os.path.join(BOOTH_DIR, "booth_config.json")
 PLUGINS_DIR = os.path.dirname(BOOTH_DIR)
 HERMES_ROOT = os.path.dirname(PLUGINS_DIR)
-MASTER_DIR = os.path.join(PLUGINS_DIR, "monitor_action_master")
+MASTER_DIR = os.path.join(PLUGINS_DIR, "her_monitor_action_master")
 
-# 严格依据 monitor_action_master 的目录结构
+# 严格依据 her_monitor_action_master 的目录结构
 MASTER_CONFIG = os.path.join(MASTER_DIR, "config", "master_config.json")
 MASTER_STATUS_DIR = os.path.join(MASTER_DIR, "status")
 
 PROFILES_DIR = os.path.join(HERMES_ROOT, "profiles")
 HERMES_BIN = os.environ.get("HERMES_BIN", "hermes")
-MASTER_GIT_URL = "https://github.com/bo2333/monitor_action_master"
+MASTER_GIT_URL = "https://github.com/bo2333/her_monitor_action_master"
 
 DEFAULT_BOOTH = {
     "max_screen_entries": 2000,

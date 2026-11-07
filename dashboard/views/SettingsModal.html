@@ -81,7 +81,7 @@
                      style="width: 320px; background:var(--bg-base); border:1px solid var(--border-strong);
                             color:var(--text-high); padding:6px; border-radius:4px;"
                      @blur="checkDbRoot" @change="checkDbRoot"
-                     placeholder="留空使用默认：monitor_action_master/data">
+                     placeholder="留空使用默认：her_monitor_action_master/data">
               <span :class="dbStatusClass()" :title="dbStatus && dbStatus.path ? dbStatus.path : ''">
                 {{ dbStatusText() }}
               </span>

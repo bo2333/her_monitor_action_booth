@@ -81,7 +81,7 @@ def safe_abs(path):
     return p
 
 def get_master_status():
-    """读取 monitor_action_master/status/*.json 获取运行状态"""
+    """读取 her_monitor_action_master/status/*.json 获取运行状态"""
     if not os.path.isdir(MASTER_STATUS_DIR): return []
     results = []
     for f in glob.glob(os.path.join(MASTER_STATUS_DIR, "*.json")):

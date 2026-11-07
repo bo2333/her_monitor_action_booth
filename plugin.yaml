@@ -1,4 +1,4 @@
-name: monitor_action_booth
+name: her_monitor_action_booth
 version: "1.2.0"
 description: 监控大厅 - 跨 Agent 多库聚合查询、Token 统计、历史检索、CSV 导出、全局配置中心。
 entry: __init__.py

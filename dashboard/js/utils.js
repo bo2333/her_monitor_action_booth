@@ -21,7 +21,7 @@ export const getLevelColor = (lv, flow, colors) => {
 
 export const getColorLabel = (k) => COLOR_LABELS[k] || k;
 
-const PLUGIN_VIEWS_BASE = '/dashboard-plugins/monitor_action_booth/views';
+const PLUGIN_VIEWS_BASE = '/dashboard-plugins/her_monitor_action_booth/views';
 
 export async function loadAssets(name) {
   const htmlUrl = `${PLUGIN_VIEWS_BASE}/${name}.html`;

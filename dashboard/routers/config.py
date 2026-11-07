@@ -32,9 +32,9 @@ def save_ui_config(cfg: dict):
             rpc_success = False
             try:
                 from tui_gateway.methods_config_set import _CONFIG_SETTERS
-                setter = _CONFIG_SETTERS.get("monitor_action_master")
+                setter = _CONFIG_SETTERS.get("her_monitor_action_master")
                 if setter:
-                    res = setter(1, {}, "monitor_action_master", master, None)
+                    res = setter(1, {}, "her_monitor_action_master", master, None)
                     if isinstance(res, dict) and "error" not in res:
                         rpc_success = True
             except ImportError:

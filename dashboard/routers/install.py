@@ -16,7 +16,7 @@ def _scan_and_link(do_link=False):
         profile_path = os.path.join(PROFILES_DIR, name)
         if not os.path.isdir(profile_path): continue
         plugins_dir = os.path.join(profile_path, "plugins")
-        link_path = os.path.join(plugins_dir, "monitor_action_master")
+        link_path = os.path.join(plugins_dir, "her_monitor_action_master")
         info = {"name": name, "path": profile_path, "link_path": link_path, "status": "unknown", "target": "", "message": ""}
 
         if not os.path.lexists(link_path):
@@ -52,7 +52,7 @@ def _scan_and_link(do_link=False):
                     if p["name"] == name: p["status"] = "skipped"; p["message"] = "目录残留，已跳过激活"; break
                 continue
             activated_any = True
-            cmd = f"{bin_q} --profile {shlex.quote(name)} plugins enable monitor_action_master"
+            cmd = f"{bin_q} --profile {shlex.quote(name)} plugins enable her_monitor_action_master"
             ok, out = run_cmd(cmd, timeout=30)
             result["activation"].append({"profile": name, "ok": ok, "message": out})
             for p in result["profiles"]:

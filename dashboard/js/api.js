@@ -1,4 +1,4 @@
-const API = '/api/plugins/monitor_action_booth';
+const API = '/api/plugins/her_monitor_action_booth';
 
 async function _streamPost(url, onLine) {
   const resp = await fetch(url, { method: 'POST' });

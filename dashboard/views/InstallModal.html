@@ -12,11 +12,11 @@
         </div>
       </transition>
       <div v-if="!result.master_exists" class="warn-box">
-        ⚠️ 未找到主插件目录：<br><code>{{ result.master_plugin_dir }}</code><br>请先将 <code>monitor_action_master</code> 安装到该目录，然后重新打开本弹窗。
+        ⚠️ 未找到主插件目录：<br><code>{{ result.master_plugin_dir }}</code><br>请先将 <code>her_monitor_action_master</code> 安装到该目录，然后重新打开本弹窗。
       </div>
       <template v-else>
         <div class="info-box">
-          将遍历 <code>{{ result.profiles_dir }}</code> 下所有 Agent 的 <code>plugins/monitor_action_master</code>，检查软链接状态。<br>
+          将遍历 <code>{{ result.profiles_dir }}</code> 下所有 Agent 的 <code>plugins/her_monitor_action_master</code>，检查软链接状态。<br>
           缺失或错误会自动修复；已正确链接的节点点击修复也会重新激活。<br>
           <b>注意：</b>激活前会先检查 Profile 是否真实存在，残留目录将被跳过。
         </div>

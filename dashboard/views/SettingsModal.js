@@ -74,7 +74,7 @@ export async function mountSettingsModal() {
       const runUpdateMaster = () => runUpdate('master');
 
       const installMaster = async () => {
-        if (!confirm('确定要为默认 Agent 安装 monitor_action_master 吗？')) return;
+        if (!confirm('确定要为默认 Agent 安装 her_monitor_action_master 吗？')) return;
         installingMaster.value = true;
         try {
           const res = await api.installDefaultMaster();

@@ -1,10 +1,10 @@
 {
-  "name": "monitor_action_booth",
+  "name": "her_monitor_action_booth",
   "label": "监控大厅",
   "icon": "Activity",
   "version": "1.2.0",
   "tab": {
-    "path": "/monitor-booth",
+    "path": "/her_monitor_action_booth",
     "position": "after:skills"
   },
   "entry": "dist/index.js",

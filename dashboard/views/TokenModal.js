@@ -65,7 +65,7 @@ export async function mountTokenModal() {
         p.append('limit', String(tokenLimit.value));
         if (detailStart.value) p.append('start', String(Math.floor(new Date(detailStart.value).getTime() / 1000)));
         if (detailEnd.value) p.append('end', String(Math.floor(new Date(detailEnd.value).getTime() / 1000)));
-        return `/api/plugins/monitor_action_booth/export/tokens?${p.toString()}`;
+        return `/api/plugins/her_monitor_action_booth/export/tokens?${p.toString()}`;
       };
 
       onMounted(() => { loadTrends(); });
