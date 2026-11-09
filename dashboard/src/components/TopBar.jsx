@@ -47,10 +47,8 @@ export default function TopBar() {
     return () => clearInterval(t);
   }, [loadStatus, pollMs]);
 
-  // 进程是否真的有依赖缺失（仅对存活进程生效）
   const hasDepsError = (st) => !!(st.deps && Object.values(st.deps).some(v => v === false));
 
-  // 只有存活的进程才参与"整体健康"判定；死进程不拉红按钮
   const allHealthy = runtime.length === 0 || runtime.every(st => {
     if (st._alive === false) return true;
     return !hasDepsError(st);
@@ -134,7 +132,6 @@ export default function TopBar() {
 
   const renderStatusCell = (col, st) => {
     if (col.key === 'status') {
-      // 三态：已退出 / 依赖缺失 / 正常
       if (st._alive === false) {
         return h('td', { key: col.key },
           h('span', { style: { color: 'var(--text-low)', fontWeight: 'bold' } }, '已退出'));
@@ -203,6 +200,7 @@ export default function TopBar() {
 
     h('div', { className: 'right-group' },
       h('button', { className: 'btn', onClick: () => s.setShowToken(true) }, '🪙 Token 明细'),
+      h('button', { className: 'btn', onClick: () => s.setShowLogs(true) }, '📋 日志'),           // ★ 新增
       h('button', { className: 'btn', onClick: () => s.setShowSettings(true) }, '⚙ 设置'),
 
       h('div', { className: 'status-container' },

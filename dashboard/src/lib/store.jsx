@@ -15,6 +15,7 @@ export function StoreProvider({ children }) {
   const [showToken, setShowToken] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showInstall, setShowInstall] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);          // ★ 新增
   const [connected, setConnected] = useState(true);
 
   const mutateCfg = useCallback((mutator) => {
@@ -27,6 +28,7 @@ export function StoreProvider({ children }) {
     filterUser, setFilterUser, filterAction, setFilterAction,
     queryStart, setQueryStart, queryEnd, setQueryEnd,
     showToken, setShowToken, showSettings, setShowSettings, showInstall, setShowInstall,
+    showLogs, setShowLogs,
     connected, setConnected,
   };
   return React.createElement(Ctx.Provider, { value }, children);

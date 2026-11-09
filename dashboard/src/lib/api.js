@@ -52,4 +52,13 @@ export const api = {
   streamUpdateBooth: (onLine) => _streamPost(`${API}/update_booth`, onLine),
   streamUpdateMaster: (onLine) => _streamPost(`${API}/update_master`, onLine),
   getRuntimeStatus: () => fetchJSON(`${API}/status`),
+
+  // ★ 新增：master 日志
+  getMasterLogs: () => fetchJSON(`${API}/master_logs`),
+  getMasterLogContent: (name, tail = 500) => {
+    const p = new URLSearchParams();
+    p.append('name', name);
+    p.append('tail', String(tail));
+    return fetchJSON(`${API}/master_log_content?${p}`);
+  },
 };

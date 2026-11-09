@@ -21,6 +21,7 @@ HERMES_ROOT = os.path.dirname(PLUGINS_DIR)
 MASTER_DIR = os.path.join(PLUGINS_DIR, "her_monitor_action_master")
 MASTER_CONFIG = os.path.join(MASTER_DIR, "config", "master_config.json")
 MASTER_STATUS_DIR = os.path.join(MASTER_DIR, "status")
+MASTER_LOG_DIR = os.path.join(MASTER_DIR, "logs")          # ★ 新增
 PROFILES_DIR = os.path.join(HERMES_ROOT, "profiles")
 HERMES_BIN = os.environ.get("HERMES_BIN", "hermes")
 MASTER_GIT_URL = "https://github.com/bo2333/her_monitor_action_master"

@@ -8,6 +8,7 @@ import LogsView from './components/LogsView';
 import TokenModal from './components/TokenModal';
 import SettingsModal from './components/SettingsModal';
 import InstallModal from './components/InstallModal';
+import LogsModal from './components/LogsModal';
 
 const h = React.createElement;
 
@@ -48,6 +49,7 @@ function InnerApp() {
     s.showToken && h(TokenModal),
     s.showSettings && h(SettingsModal),
     s.showInstall && h(InstallModal),
+    s.showLogs && h(LogsModal),          // ★ 新增
   );
 }
 
