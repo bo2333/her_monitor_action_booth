@@ -20,16 +20,39 @@ def _pid_alive(pid):
         return False
 
 
+def load_def_json(def_path, default=None):
+    """从 .def.json 读默认结构。读不到返回 default（None 则返回 {}）。"""
+    try:
+        with open(def_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        pass
+    return default if default is not None else {}
+
+
 def ensure_config_file(target_path, def_path, fallback_default=None):
     """确保 target_path 存在。
 
     优先级：
-    1. 已存在 → 直接返回 True
-    2. 从 def_path（.def.json）复制生成
-    3. 使用 fallback_default 写入
+    1. 已存在且能解析 → 返回 True
+    2. 已存在但损坏 → 删除后尝试从 def_path 复制
+    3. 不存在 → 从 def_path 复制
+    4. def_path 不存在/复制失败 → 仅在 fallback_default 非 None 时写入
+       （当前调用方均不传 fallback_default，即只用 .def.json）
     """
     if os.path.exists(target_path):
-        return True
+        try:
+            with open(target_path, "r", encoding="utf-8") as f:
+                json.load(f)
+            return True
+        except Exception as e:
+            print(f"[Booth] {target_path} 损坏（{e}），将从模板重新生成")
+            try:
+                os.remove(target_path)
+            except Exception:
+                pass
 
     try:
         d = os.path.dirname(target_path)
@@ -50,7 +73,7 @@ def ensure_config_file(target_path, def_path, fallback_default=None):
             print(f"[Booth] 已从 {def_path} 生成默认配置 {target_path}")
             return True
         except Exception as e:
-            print(f"[Booth] 从 {def_path} 复制失败: {e}，回退到内置默认值")
+            print(f"[Booth] 从 {def_path} 复制失败: {e}，回退到 fallback_default")
 
     if fallback_default is not None:
         try:
@@ -63,6 +86,10 @@ def ensure_config_file(target_path, def_path, fallback_default=None):
             print(f"[Booth] 创建配置文件失败 {target_path}: {e}")
             return False
 
+    print(
+        f"[Booth] 无法生成 {target_path}："
+        f"{def_path} 不存在且未提供 fallback"
+    )
     return False
 
 
@@ -152,7 +179,6 @@ def safe_abs(path):
 
 
 def get_master_status():
-    """读取 master 的 status 目录，附加 _alive 字段表示 pid 是否存活。"""
     if not os.path.isdir(MASTER_STATUS_DIR):
         return []
     results = []
