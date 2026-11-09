@@ -22,7 +22,8 @@ def save_json(path, data):
         return False
 
 def probe_dir(path):
-    info = {"path": "", "exists": False, "is_dir": False, "readable": False, "writable": False, "ok": False, "message": ""}
+    info = {"path": "", "exists": False, "is_dir": False, "readable": False,
+            "writable": False, "ok": False, "message": ""}
     if not path or not str(path).strip():
         info["message"] = "未配置"; return info
     try: p = resolve_path(path)
@@ -52,8 +53,7 @@ def probe_dir(path):
 def run_cmd(cmd, timeout=60):
     try:
         p = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
-        out = (p.stdout or "").strip()
-        err = (p.stderr or "").strip()
+        out = (p.stdout or "").strip(); err = (p.stderr or "").strip()
         if p.returncode == 0: return True, out or "ok"
         return False, err or out or f"exit {p.returncode}"
     except subprocess.TimeoutExpired: return False, f"命令超时({timeout}s): {cmd}"
@@ -81,14 +81,12 @@ def safe_abs(path):
     return p
 
 def get_master_status():
-    """读取 her_monitor_action_master/status/*.json 获取运行状态"""
     if not os.path.isdir(MASTER_STATUS_DIR): return []
     results = []
     for f in glob.glob(os.path.join(MASTER_STATUS_DIR, "*.json")):
         try:
             with open(f, "r", encoding="utf-8") as fp:
-                data = json.load(fp)
-                data["_file"] = os.path.basename(f)
+                data = json.load(fp); data["_file"] = os.path.basename(f)
                 results.append(data)
         except Exception: pass
     results.sort(key=lambda x: x.get("started_at", 0), reverse=True)

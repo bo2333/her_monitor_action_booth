@@ -1,82 +1,69 @@
-import os, shlex
-from fastapi import APIRouter, HTTPException
-from core.paths import HERMES_BIN, MASTER_DIR, MASTER_GIT_URL, PROFILES_DIR
-from core.utils import get_valid_profiles, run_cmd
-
+import os, shutil
+from fastapi import APIRouter
+from core.paths import MASTER_DIR, PROFILES_DIR
 router = APIRouter()
 
-def _scan_and_link(do_link=False):
-    result = {"master_exists": os.path.isdir(MASTER_DIR), "master_plugin_dir": MASTER_DIR, "profiles_dir": PROFILES_DIR, "profiles": [], "activation": [], "reload": None}
-    if not result["master_exists"] or not os.path.isdir(PROFILES_DIR): return result
-    expected_realpath = os.path.realpath(MASTER_DIR)
-    need_activate = []
+def _master_plugin_dir(profile):
+    return os.path.join(PROFILES_DIR, profile, "plugins", "her_monitor_action_master")
 
-    for name in sorted(os.listdir(PROFILES_DIR)):
-        if name.startswith("."): continue
-        profile_path = os.path.join(PROFILES_DIR, name)
-        if not os.path.isdir(profile_path): continue
-        plugins_dir = os.path.join(profile_path, "plugins")
-        link_path = os.path.join(plugins_dir, "her_monitor_action_master")
-        info = {"name": name, "path": profile_path, "link_path": link_path, "status": "unknown", "target": "", "message": ""}
-
-        if not os.path.lexists(link_path):
-            info["status"] = "missing"; info["message"] = "未链接"
-            if do_link:
-                try:
-                    os.makedirs(plugins_dir, exist_ok=True); os.symlink(MASTER_DIR, link_path, target_is_directory=True)
-                    info.update(status="linked", target=MASTER_DIR, message="已创建软链接"); need_activate.append(name)
-                except Exception as e: info.update(status="error", message=f"创建失败: {e}")
-        elif os.path.islink(link_path):
-            actual = os.path.realpath(link_path); info["target"] = actual
-            if actual == expected_realpath:
-                info.update(status="linked", message="已正确链接")
-                if do_link: need_activate.append(name)
-            else:
-                info.update(status="broken", message="链接指向错误")
-                if do_link:
-                    try:
-                        os.unlink(link_path); os.symlink(MASTER_DIR, link_path, target_is_directory=True)
-                        info.update(status="linked", target=MASTER_DIR, message="已修复为正确链接"); need_activate.append(name)
-                    except Exception as e: info.update(status="error", message=f"修复失败: {e}")
-        else: info.update(status="conflict", message="已独立安装，不覆盖")
-        result["profiles"].append(info)
-
-    if do_link and need_activate:
-        valid, msg = get_valid_profiles()
-        if valid is None or not valid: valid = set(need_activate)
-        bin_q = shlex.quote(HERMES_BIN); activated_any = False
-        for name in need_activate:
-            if name not in valid:
-                result["activation"].append({"profile": name, "ok": False, "skipped": True, "message": "Profile 不存在（目录残留），已跳过激活"})
-                for p in result["profiles"]:
-                    if p["name"] == name: p["status"] = "skipped"; p["message"] = "目录残留，已跳过激活"; break
-                continue
-            activated_any = True
-            cmd = f"{bin_q} --profile {shlex.quote(name)} plugins enable her_monitor_action_master"
-            ok, out = run_cmd(cmd, timeout=30)
-            result["activation"].append({"profile": name, "ok": ok, "message": out})
-            for p in result["profiles"]:
-                if p["name"] == name:
-                    if ok: p["status"] = "linked"; p["message"] = "已创建/修复链接并激活"
-                    else: p["status"] = "linked_inactive"; p["message"] = f"已链接，激活失败: {out}"
-                    break
-        if activated_any:
-            ok, out = run_cmd(f"{bin_q} gateway restart", timeout=120)
-            result["reload"] = {"ok": ok, "message": out}
-        else: result["reload"] = {"ok": True, "message": "没有需要激活的有效 Profile，跳过网关重启"}
-    return result
+def _profile_exists(profile):
+    return os.path.isdir(os.path.join(PROFILES_DIR, profile))
 
 @router.get("/install_status")
-def get_install_status(): return _scan_and_link(do_link=False)
+def install_status():
+    master_exists = os.path.isdir(MASTER_DIR)
+    profiles = []
+    if os.path.isdir(PROFILES_DIR):
+        for name in sorted(os.listdir(PROFILES_DIR)):
+            pdir = os.path.join(PROFILES_DIR, name)
+            if not os.path.isdir(pdir): continue
+            target = _master_plugin_dir(name)
+            status = "missing"; message = "未链接"; tgt = ""
+            if os.path.islink(target):
+                tgt = os.readlink(target)
+                if os.path.exists(target): status = "linked"; message = "已链接"
+                else: status = "broken"; message = "链接错误"
+            elif os.path.exists(target):
+                status = "conflict"; message = "独立安装"
+            elif _profile_exists(name):
+                status = "linked_inactive"; message = "未激活"
+            profiles.append({"name": name, "status": status, "message": message, "target": tgt})
+    return {"master_exists": master_exists, "master_plugin_dir": MASTER_DIR,
+            "profiles_dir": PROFILES_DIR, "profiles": profiles,
+            "activation": [], "reload": None}
 
 @router.post("/install_master")
-def install_master(): return _scan_and_link(do_link=True)
+def install_master():
+    if not os.path.isdir(MASTER_DIR):
+        return {"ok": False, "message": "master 插件目录不存在"}
+    activation = []
+    if os.path.isdir(PROFILES_DIR):
+        for name in sorted(os.listdir(PROFILES_DIR)):
+            pdir = os.path.join(PROFILES_DIR, name)
+            if not os.path.isdir(pdir): continue
+            target = _master_plugin_dir(name)
+            ok = True; msg = "已链接"
+            try:
+                os.makedirs(os.path.dirname(target), exist_ok=True)
+                if os.path.islink(target) or os.path.exists(target):
+                    if os.path.islink(target): os.unlink(target)
+                    else: shutil.rmtree(target, ignore_errors=True)
+                os.symlink(MASTER_DIR, target)
+            except Exception as e:
+                ok = False; msg = str(e)
+            activation.append({"profile": name, "ok": ok, "skipped": False, "message": msg})
+    return {"master_exists": True, "master_plugin_dir": MASTER_DIR,
+            "profiles_dir": PROFILES_DIR, "profiles": [],
+            "activation": activation, "reload": {"ok": True, "message": "请手动重启 gateway"}}
 
 @router.post("/install_default_master")
 def install_default_master():
-    bin_q = shlex.quote(HERMES_BIN); url_q = shlex.quote(MASTER_GIT_URL)
-    ok, msg = run_cmd(f"{bin_q} plugins install {url_q} --enable --force", timeout=180)
-    if not ok: raise HTTPException(500, f"安装失败: {msg}")
-    ok2, msg2 = run_cmd(f"{bin_q} gateway restart", timeout=120)
-    if not ok2: return {"success": True, "message": f"插件已安装，但网关重启失败: {msg2}。请手动重启网关"}
-    return {"success": True, "message": "安装成功，网关已重启"}
+    target = os.path.join(PROFILES_DIR, "default", "plugins", "her_monitor_action_master")
+    try:
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        if os.path.islink(target): os.unlink(target)
+        elif os.path.exists(target): shutil.rmtree(target, ignore_errors=True)
+        os.symlink(MASTER_DIR, target)
+        return {"ok": True, "message": "默认 Agent 安装成功"}
+    except Exception as e:
+        return {"ok": False, "message": str(e)}

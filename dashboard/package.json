@@ -1,0 +1,11 @@
+{
+  "name": "her-monitor-action-booth-dashboard",
+  "version": "1.3.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:js && npm run build:css",
+    "build:js": "esbuild src/index.jsx --bundle --format=iife --target=es2020 --outfile=dist/index.js --external:react --minify",
+    "build:css": "esbuild styles/index.css --bundle --outfile=dist/style.css --minify"
+  },
+  "devDependencies": { "esbuild": "^0.20.0" }
+}

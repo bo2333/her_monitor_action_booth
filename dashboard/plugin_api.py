@@ -1,10 +1,7 @@
-"""her_monitor_action_booth Dashboard 后端入口：仅聚合 router。"""
-import os
-import sys
-
-_DASHBOARD_DIR = os.path.dirname(os.path.abspath(__file__))
-if _DASHBOARD_DIR not in sys.path:
-    sys.path.append(_DASHBOARD_DIR)
+import os, sys
+_DASH = os.path.dirname(os.path.abspath(__file__))
+if _DASH not in sys.path:
+    sys.path.insert(0, _DASH)
 
 from fastapi import APIRouter
 from routers import config, meta, history, token, stats, status, install, update

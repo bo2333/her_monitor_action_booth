@@ -1,0 +1,18 @@
+{
+  "apiPrefix": "/api/plugins/her_monitor_action_booth",
+  "pluginName": "her_monitor_action_booth",
+  "polling": {
+    "statusIntervalMs": 10000,
+    "queryLoadingMs": 500
+  },
+  "defaults": {
+    "queryRangeSeconds": 3600,
+    "historyLimit": 2000,
+    "tokenDetailLimit": 0
+  },
+  "eventNames": {
+    "doQuery": "do-query",
+    "clearLogs": "clear-logs",
+    "openInstall": "open-install"
+  }
+}

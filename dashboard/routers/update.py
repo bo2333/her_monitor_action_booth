@@ -2,7 +2,6 @@ import os, subprocess
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from core.paths import BOOTH_DIR, MASTER_DIR
-
 router = APIRouter()
 
 def _has_git(path): return os.path.isdir(os.path.join(path, ".git"))
@@ -10,7 +9,9 @@ def _has_git(path): return os.path.isdir(os.path.join(path, ".git"))
 @router.get("/update_status")
 def get_update_status():
     return {"booth": {"git": _has_git(BOOTH_DIR), "path": BOOTH_DIR},
-            "master": {"installed": os.path.isdir(MASTER_DIR), "git": os.path.isdir(MASTER_DIR) and _has_git(MASTER_DIR), "path": MASTER_DIR}}
+            "master": {"installed": os.path.isdir(MASTER_DIR),
+                       "git": os.path.isdir(MASTER_DIR) and _has_git(MASTER_DIR),
+                       "path": MASTER_DIR}}
 
 def _stream_git_pull(path):
     def gen():
@@ -18,7 +19,8 @@ def _stream_git_pull(path):
         p = None
         try:
             env = os.environ.copy(); env["GIT_TERMINAL_PROMPT"] = "0"; env["GIT_ASKPASS"] = "echo"
-            p = subprocess.Popen("git pull", shell=True, cwd=path, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+            p = subprocess.Popen("git pull", shell=True, cwd=path, env=env,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
             for line in iter(p.stdout.readline, ""):
                 if not line: break
                 yield f"data: {line.rstrip(chr(10)).rstrip(chr(13))}\n\n"

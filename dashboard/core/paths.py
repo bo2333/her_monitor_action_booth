@@ -8,11 +8,8 @@ BOOTH_CONFIG = os.path.join(BOOTH_DIR, "booth_config.json")
 PLUGINS_DIR = os.path.dirname(BOOTH_DIR)
 HERMES_ROOT = os.path.dirname(PLUGINS_DIR)
 MASTER_DIR = os.path.join(PLUGINS_DIR, "her_monitor_action_master")
-
-# 严格依据 her_monitor_action_master 的目录结构
 MASTER_CONFIG = os.path.join(MASTER_DIR, "config", "master_config.json")
 MASTER_STATUS_DIR = os.path.join(MASTER_DIR, "status")
-
 PROFILES_DIR = os.path.join(HERMES_ROOT, "profiles")
 HERMES_BIN = os.environ.get("HERMES_BIN", "hermes")
 MASTER_GIT_URL = "https://github.com/bo2333/her_monitor_action_master"
@@ -35,13 +32,12 @@ DEFAULT_BOOTH = {
 
 DEFAULT_MASTER = {
     "enabled": False, "logging": False, "db_root": "",
-    "remote": {"enabled": False, "host": "127.0.0.1",
-               "port": 9999, "check_interval": 60},
+    "remote": {"enabled": False, "host": "127.0.0.1", "port": 9999, "check_interval": 60},
 }
 
-SYSTEM_TOP = {"/", "/bin", "/boot", "/dev", "/etc", "/lib", "/lib64",
-              "/proc", "/root", "/run", "/sbin", "/srv", "/sys",
-              "/usr", "/var", "/home", "/opt", "/tmp"}
+SYSTEM_TOP = {"/", "/bin", "/boot", "/dev", "/etc", "/lib", "/lib64", "/proc",
+              "/root", "/run", "/sbin", "/srv", "/sys", "/usr", "/var",
+              "/home", "/opt", "/tmp"}
 
 def resolve_path(path):
     if not path or not str(path).strip():

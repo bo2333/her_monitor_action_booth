@@ -4,11 +4,11 @@ from fastapi import APIRouter, Query
 from fastapi.responses import StreamingResponse
 from core.db_reader import query_history
 from core.master_config import effective_db_root
-
 router = APIRouter()
 
 @router.get("/history")
-def history(start: int = Query(None), end: int = Query(None), after_ts: int = Query(0), user: str = Query(None), limit: int = Query(1000, ge=1, le=100000)):
+def history(start: int = Query(None), end: int = Query(None), after_ts: int = Query(0),
+            user: str = Query(None), limit: int = Query(1000, ge=1, le=100000)):
     return query_history(effective_db_root(), start=start, end=end, after_ts=after_ts, user=user, limit=limit)
 
 @router.get("/export/history")

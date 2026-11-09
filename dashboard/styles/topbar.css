@@ -1,0 +1,232 @@
+/* ================= 顶部栏基础布局 ================= */
+.top-bar {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 100;
+}
+
+.filter-group, .action-group, .right-group { display: flex; align-items: center; gap: 12px; }
+.divider { width: 1px; height: 20px; background: var(--border-subtle); margin: 0 8px; }
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 4px 10px;
+  transition: all 0.2s;
+}
+.input-wrapper:hover, .input-wrapper:focus-within {
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
+}
+.input-wrapper span {
+  font-size: 12px;
+  color: var(--text-low);
+  margin-right: 8px;
+  font-weight: 600;
+}
+.input-wrapper select {
+  background: transparent;
+  color: var(--text-high);
+  border: none;
+  padding: 4px 0;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  min-width: 100px;
+}
+.input-wrapper select option {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-high) !important;
+}
+
+.action-dropdown { position: relative; padding: 4px 10px; }
+.dropdown-trigger {
+  min-width: 120px;
+  max-width: 220px;
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--text-high);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  min-width: 260px;
+  max-width: 360px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 6px 0;
+  z-index: 9999;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--text-high);
+  cursor: pointer;
+  user-select: none;
+}
+.dropdown-item:hover { background: var(--bg-hover); }
+.dropdown-item input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
+.dropdown-item span.selected { color: var(--primary); font-weight: 600; }
+.dropdown-category {
+  padding: 8px 14px 4px;
+  font-size: 11px;
+  color: var(--text-low);
+  font-style: italic;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 8px;
+}
+
+.btn {
+  background: var(--bg-elevated);
+  color: var(--text-high);
+  border: 1px solid var(--border-subtle);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.btn:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+.btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.spacer { flex: 1; }
+
+.time-wrapper input[type="datetime-local"] {
+  background: transparent;
+  color: var(--text-high);
+  border: none;
+  padding: 4px 0;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  min-width: 170px;
+  font-family: inherit;
+}
+.time-wrapper input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+/* ================= 运行状态按钮与弹出面板 ================= */
+.status-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.status-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  user-select: none;
+}
+.status-btn:hover { opacity: 0.8; }
+.status-ok {
+  color: var(--success);
+  border-color: rgba(63,185,80,0.3);
+  background: rgba(63,185,80,0.1);
+}
+.status-error {
+  color: var(--danger);
+  border-color: rgba(248,81,73,0.3);
+  background: rgba(248,81,73,0.1);
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.status-ok .status-dot {
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(63,185,80,0.6);
+}
+.status-error .status-dot {
+  background: var(--danger);
+  box-shadow: 0 0 8px rgba(248,81,73,0.6);
+}
+
+.status-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  width: 340px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+.status-panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.status-panel-body {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.status-panel-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.status-panel-body th, .status-panel-body td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.status-panel-body th {
+  color: var(--text-low);
+  font-weight: normal;
+  position: sticky;
+  top: 0;
+  background: var(--bg-elevated);
+}
+.status-panel-footer {
+  padding: 8px 14px;
+  border-top: 1px solid var(--border-subtle);
+  text-align: right;
+}

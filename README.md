@@ -1,12 +1,10 @@
-her_monitor_action_booth/
+~/.hermes/plugins/her_monitor_action_booth/
 ├── plugin.yaml
 ├── booth_config.json
 └── dashboard/
+    ├── __init__.py
     ├── manifest.json
-    ├── index.html
-    ├── plugin_api.py
-    ├── dist/
-    │   └── index.js
+    ├── plugin_api.py          ← 必须在 dashboard/ 内
     ├── core/
     │   ├── __init__.py
     │   ├── paths.py
@@ -20,24 +18,38 @@ her_monitor_action_booth/
     │   ├── history.py
     │   ├── token.py
     │   ├── stats.py
+    │   ├── status.py
     │   ├── install.py
     │   └── update.py
-    ├── css/
+    ├── config/
+    │   ├── constants.json
+    │   └── ui.json
+    ├── src/
+    │   ├── index.jsx
+    │   ├── App.jsx
+    │   ├── lib/
+    │   │   ├── sdk.js
+    │   │   ├── store.jsx
+    │   │   ├── api.js
+    │   │   ├── config.js
+    │   │   ├── format.js
+    │   │   ├── parsers.js
+    │   │   └── data/{actions,colors}.js
+    │   └── components/
+    │       ├── TopBar.jsx
+    │       ├── LogsView.jsx
+    │       ├── TokenModal.jsx
+    │       ├── SettingsModal.jsx
+    │       └── InstallModal.jsx
+    ├── styles/
+    │   ├── index.css
     │   ├── base.css
-    │   └── view-base.css
-    ├── js/
-    │   ├── app.js
-    │   ├── store.js
-    │   ├── api.js
-    │   ├── utils.js
-    │   ├── parsers.js
-    │   └── data/
-    │       ├── actions.js
-    │       └── colors.js
-    └── views/
-        ├── TopBar.html, TopBar.js, TopBar.css
-        ├── LogsView.html, LogsView.js, LogsView.css
-        ├── TokenModal.html, TokenModal.js, TokenModal.css
-        ├── SettingsModal.html, SettingsModal.js, SettingsModal.css
-        └── InstallModal.html, InstallModal.js, InstallModal.css
-        (删除 HistoryModal.*)
+    │   ├── modals.css
+    │   ├── topbar.css
+    │   ├── logs.css
+    │   └── settings.css
+    ├── dist/
+    │   ├── index.js
+    │   └── style.css
+    ├── package.json
+    └── .gitignore
