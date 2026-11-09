@@ -3,14 +3,6 @@ from core.paths import HERMES_BIN, SYSTEM_TOP, resolve_path, MASTER_STATUS_DIR
 
 
 def _pid_alive(pid):
-    """判断进程是否存活。
-
-    - pid 无效 / <= 0 → False
-    - os.kill(pid, 0) 成功 → True
-    - ProcessLookupError → False（不存在）
-    - PermissionError → True（存在但无权限，按存活处理）
-    - 其它异常 → False（保守）
-    """
     try:
         pid = int(pid)
     except (TypeError, ValueError):
@@ -26,6 +18,52 @@ def _pid_alive(pid):
         return True
     except Exception:
         return False
+
+
+def ensure_config_file(target_path, def_path, fallback_default=None):
+    """确保 target_path 存在。
+
+    优先级：
+    1. 已存在 → 直接返回 True
+    2. 从 def_path（.def.json）复制生成
+    3. 使用 fallback_default 写入
+    """
+    if os.path.exists(target_path):
+        return True
+
+    try:
+        d = os.path.dirname(target_path)
+        if d:
+            os.makedirs(d, exist_ok=True)
+    except Exception as e:
+        print(f"[Booth] 创建目录失败 {os.path.dirname(target_path)}: {e}")
+        return False
+
+    if def_path and os.path.exists(def_path):
+        try:
+            with open(def_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            tmp = target_path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, target_path)
+            print(f"[Booth] 已从 {def_path} 生成默认配置 {target_path}")
+            return True
+        except Exception as e:
+            print(f"[Booth] 从 {def_path} 复制失败: {e}，回退到内置默认值")
+
+    if fallback_default is not None:
+        try:
+            tmp = target_path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(fallback_default, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, target_path)
+            return True
+        except Exception as e:
+            print(f"[Booth] 创建配置文件失败 {target_path}: {e}")
+            return False
+
+    return False
 
 
 def load_json(path, default):
@@ -114,11 +152,7 @@ def safe_abs(path):
 
 
 def get_master_status():
-    """读取 master 的 status 目录，附加 _alive 字段表示 pid 是否存活。
-
-    死进程的记录不丢弃（保留最近一次启动快照供参考），
-    但通过 _alive=False 明确标记，由前端决定展示语义。
-    """
+    """读取 master 的 status 目录，附加 _alive 字段表示 pid 是否存活。"""
     if not os.path.isdir(MASTER_STATUS_DIR):
         return []
     results = []

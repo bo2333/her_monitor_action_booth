@@ -1,3 +1,6 @@
 /booth_config.json
 /.idea
 /dashboard/node_modules
+/booth_config.bak.json
+/dashboard/config/constants.json
+/dashboard/config/ui.json

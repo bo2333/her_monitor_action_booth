@@ -1,22 +1,34 @@
 import os
 from fastapi import APIRouter, HTTPException, Query
-from core.paths import BOOTH_CONFIG, DEFAULT_BOOTH, MASTER_CONFIG, MASTER_DIR, default_db_root
-from core.utils import load_json, save_json, probe_dir, safe_abs
+from core.paths import (
+    BOOTH_CONFIG, BOOTH_CONFIG_DEF,
+    CONSTANTS_FILE, CONSTANTS_DEF,
+    UI_FILE, UI_DEF,
+    DEFAULT_BOOTH, MASTER_CONFIG, MASTER_DIR, default_db_root,
+)
+from core.utils import (
+    load_json, save_json, probe_dir, safe_abs, ensure_config_file,
+)
 from core.master_config import effective_db_root, merge_defaults, save_master_config
 
 router = APIRouter()
-_CONFIG_DIR = os.path.join(os.path.dirname(BOOTH_CONFIG), "dashboard", "config")
+
 
 @router.get("/constants")
 def get_constants():
-    return load_json(os.path.join(_CONFIG_DIR, "constants.json"), {})
+    ensure_config_file(CONSTANTS_FILE, CONSTANTS_DEF, {})
+    return load_json(CONSTANTS_FILE, {})
+
 
 @router.get("/ui-config")
 def get_ui_config_frontend():
-    return load_json(os.path.join(_CONFIG_DIR, "ui.json"), {})
+    ensure_config_file(UI_FILE, UI_DEF, {})
+    return load_json(UI_FILE, {})
+
 
 @router.get("/ui_config")
 def get_ui_config():
+    ensure_config_file(BOOTH_CONFIG, BOOTH_CONFIG_DEF, DEFAULT_BOOTH)
     booth = load_json(BOOTH_CONFIG, DEFAULT_BOOTH)
     master = merge_defaults(load_json(MASTER_CONFIG, {}))
     master_exists = os.path.isdir(MASTER_DIR)
@@ -26,11 +38,15 @@ def get_ui_config():
             "master_config_path": MASTER_CONFIG,
             "db_root_status": probe_dir(master["db_root"]) if master_exists else None}
 
+
 @router.post("/ui_config")
 def save_ui_config(cfg: dict):
     try:
         booth = cfg.get("booth"); master = cfg.get("master")
-        if booth is not None: save_json(BOOTH_CONFIG, booth)
+        if booth is not None:
+            # ★ 保存前也确保目标路径存在目录
+            os.makedirs(os.path.dirname(BOOTH_CONFIG), exist_ok=True)
+            save_json(BOOTH_CONFIG, booth)
         if master is not None and os.path.isdir(MASTER_DIR):
             rpc_success = False
             try:
@@ -45,10 +61,12 @@ def save_ui_config(cfg: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/db_root_status")
 def get_db_root_status(path: str = Query(None)):
     if path is None or not str(path).strip(): return probe_dir(effective_db_root())
     return probe_dir(path)
+
 
 @router.post("/fix_db_root_permission")
 def fix_db_root_permission(payload: dict):
@@ -62,6 +80,7 @@ def fix_db_root_permission(payload: dict):
     except PermissionError as e: raise HTTPException(403, f"设置权限失败（权限不足）: {e}")
     except Exception as e: raise HTTPException(500, f"设置权限失败: {e}")
     return probe_dir(p)
+
 
 @router.post("/ensure_db_root")
 def ensure_db_root(payload: dict):
