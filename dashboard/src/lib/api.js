@@ -53,7 +53,7 @@ export const api = {
   streamUpdateMaster: (onLine) => _streamPost(`${API}/update_master`, onLine),
   getRuntimeStatus: () => fetchJSON(`${API}/status`),
 
-  // ★ 新增：master 日志
+  // ---- master 日志 ----
   getMasterLogs: () => fetchJSON(`${API}/master_logs`),
   getMasterLogContent: (name, tail = 500) => {
     const p = new URLSearchParams();
@@ -61,4 +61,21 @@ export const api = {
     p.append('tail', String(tail));
     return fetchJSON(`${API}/master_log_content?${p}`);
   },
+  clearMasterLog: (name) => fetchJSON(
+    `${API}/master_log_clear?name=${encodeURIComponent(name)}`,
+    { method: 'POST' }
+  ),
+
+  // ---- booth 日志 ----
+  getBoothLogs: () => fetchJSON(`${API}/booth_logs`),
+  getBoothLogContent: (name, tail = 500) => {
+    const p = new URLSearchParams();
+    p.append('name', name);
+    p.append('tail', String(tail));
+    return fetchJSON(`${API}/booth_log_content?${p}`);
+  },
+  clearBoothLog: (name) => fetchJSON(
+    `${API}/booth_log_clear?name=${encodeURIComponent(name)}`,
+    { method: 'POST' }
+  ),
 };

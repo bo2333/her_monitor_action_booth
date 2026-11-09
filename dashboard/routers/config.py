@@ -1,15 +1,30 @@
 import os
 from fastapi import APIRouter, HTTPException, Query
-from core.paths import (
-    BOOTH_CONFIG, BOOTH_CONFIG_DEF,
-    CONSTANTS_FILE, CONSTANTS_DEF,
-    UI_FILE, UI_DEF,
-    DEFAULT_BOOTH, MASTER_CONFIG, MASTER_DIR, default_db_root,
-)
-from core.utils import (
-    load_json, save_json, probe_dir, safe_abs, ensure_config_file,
-)
+from core.paths import BOOTH_CONFIG, DEFAULT_BOOTH, MASTER_CONFIG, MASTER_DIR, default_db_root
+from core.utils import load_json, save_json, probe_dir, safe_abs
 from core.master_config import effective_db_root, merge_defaults, save_master_config
+
+# ★ 新常量容错：paths.py 未更新也能启动
+try:
+    from core.paths import BOOTH_CONFIG_DEF
+except ImportError:
+    BOOTH_CONFIG_DEF = os.path.join(os.path.dirname(BOOTH_CONFIG), "booth_config.def.json")
+
+try:
+    from core.paths import CONSTANTS_FILE, CONSTANTS_DEF, UI_FILE, UI_DEF
+except ImportError:
+    _CFG_DIR = os.path.join(os.path.dirname(BOOTH_CONFIG), "dashboard", "config")
+    CONSTANTS_FILE = os.path.join(_CFG_DIR, "constants.json")
+    CONSTANTS_DEF  = os.path.join(_CFG_DIR, "constants.def.json")
+    UI_FILE        = os.path.join(_CFG_DIR, "ui.json")
+    UI_DEF         = os.path.join(_CFG_DIR, "ui.def.json")
+
+# ★ ensure_config_file 容错：utils.py 未更新也能启动
+try:
+    from core.utils import ensure_config_file
+except ImportError:
+    def ensure_config_file(target, def_path, fallback=None):
+        return False
 
 router = APIRouter()
 
@@ -43,10 +58,7 @@ def get_ui_config():
 def save_ui_config(cfg: dict):
     try:
         booth = cfg.get("booth"); master = cfg.get("master")
-        if booth is not None:
-            # ★ 保存前也确保目标路径存在目录
-            os.makedirs(os.path.dirname(BOOTH_CONFIG), exist_ok=True)
-            save_json(BOOTH_CONFIG, booth)
+        if booth is not None: save_json(BOOTH_CONFIG, booth)
         if master is not None and os.path.isdir(MASTER_DIR):
             rpc_success = False
             try:
