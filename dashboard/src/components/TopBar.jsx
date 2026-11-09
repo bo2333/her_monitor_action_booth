@@ -47,8 +47,14 @@ export default function TopBar() {
     return () => clearInterval(t);
   }, [loadStatus, pollMs]);
 
+  // 进程是否真的有依赖缺失（仅对存活进程生效）
   const hasDepsError = (st) => !!(st.deps && Object.values(st.deps).some(v => v === false));
-  const allHealthy = runtime.length === 0 || runtime.every(st => !hasDepsError(st));
+
+  // 只有存活的进程才参与"整体健康"判定；死进程不拉红按钮
+  const allHealthy = runtime.length === 0 || runtime.every(st => {
+    if (st._alive === false) return true;
+    return !hasDepsError(st);
+  });
 
   useEffect(() => {
     const close = () => { setActionOpen(false); setShowStatus(false); };
@@ -128,9 +134,17 @@ export default function TopBar() {
 
   const renderStatusCell = (col, st) => {
     if (col.key === 'status') {
-      return hasDepsError(st)
-        ? h('td', { key: col.key }, h('span', { style: { color: 'var(--danger)', fontWeight: 'bold' } }, '异常'))
-        : h('td', { key: col.key }, h('span', { style: { color: 'var(--success)', fontWeight: 'bold' } }, '正常'));
+      // 三态：已退出 / 依赖缺失 / 正常
+      if (st._alive === false) {
+        return h('td', { key: col.key },
+          h('span', { style: { color: 'var(--text-low)', fontWeight: 'bold' } }, '已退出'));
+      }
+      if (hasDepsError(st)) {
+        return h('td', { key: col.key },
+          h('span', { style: { color: '#d29922', fontWeight: 'bold' } }, '依赖缺失'));
+      }
+      return h('td', { key: col.key },
+        h('span', { style: { color: 'var(--success)', fontWeight: 'bold' } }, '正常'));
     }
     const style = {};
     if (col.style === 'user')  { style.fontWeight = 'bold'; style.color = '#7ee787'; }

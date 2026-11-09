@@ -1,3 +1,4 @@
+# 项目根目录
 import os, sys
 _DASH = os.path.dirname(os.path.abspath(__file__))
 if _DASH not in sys.path:
